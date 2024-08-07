@@ -25,6 +25,8 @@ import {
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
 import { Button } from 'rizzui'
 import { useRouter } from 'next/router'
+import Link from 'next/link'
+import Image from 'next/image'
 
 const products = [
     { name: 'Analytics', description: 'Get a better understanding of your traffic', href: '#', icon: ChartPieIcon },
@@ -54,10 +56,10 @@ export default function AuthHeader() {
         <header className="bg-white shadow-md">
             <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
                 <div className="flex lg:flex-1">
-                    <a href="#" className="-m-1.5 p-1.5">
+                    <Link href="#" className="-m-1.5 p-1.5">
                         <span className="sr-only">Your Company</span>
-                        <img alt="" src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600" className="h-8 w-auto" />
-                    </a>
+                        <Image alt="" src="/next.svg" className="h-8 w-auto" height={8} width={8} />
+                    </Link>
                 </div>
                 <div className="flex lg:hidden">
                     <button
@@ -83,14 +85,16 @@ export default function AuthHeader() {
                 <div className="fixed inset-0 z-10" />
                 <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
                     <div className="flex items-center justify-between">
-                        <a href="#" className="-m-1.5 p-1.5">
+                        <Link href="#" className="-m-1.5 p-1.5">
                             <span className="sr-only">Your Company</span>
-                            <img
-                                alt=""
-                                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+                            <Image
+                                alt="vercel"
+                                src="/vercel.svg"
                                 className="h-8 w-auto"
+                                height={8}
+                                width={8}
                             />
-                        </a>
+                        </Link>
                         <button
                             type="button"
                             onClick={() => setMobileMenuOpen(false)}
