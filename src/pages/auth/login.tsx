@@ -40,7 +40,7 @@ export default function Login() {
 
                 localStorage.setItem("accessToken", JSON.stringify(response?.data?.token));
                 toast.success('Login successful');
-                Router.push("signup")
+                Router.push("/todo");
             } else {
                 toast.error("Invalid Email or Password");
             }
@@ -52,7 +52,6 @@ export default function Login() {
 
     React.useEffect(() => {
         if (isAuthenticated) {
-            console.log('sdasd', isAuthenticated)
             Router.push("/todo");
         }
     }, [isAuthenticated, Router]);
@@ -83,12 +82,14 @@ export default function Login() {
                     </div>
 
                     <div>
-                        <Input
-                            label="Password"
-                            type="password"
-                            placeholder="Enter your password"
-                            {...register("password")}
-                        />
+                        <div className="rizzui-input-root flex flex-col">
+                            <label className="block">
+                                <span className="rizzui-input-label block text-sm mb-1.5 font-medium">Password</span>
+                                <span className="rizzui-input-container flex items-center peer w-full transition duration-200 [&amp;.is-focus]:ring-[0.8px] ring-[0.6px] [&amp;.is-hover]:border-primary [&amp;.is-focus]:border-primary [&amp;.is-focus]:ring-primary [&amp;_input::placeholder]:opacity-60 px-3.5 py-2 text-sm h-10 rounded-md border border-muted ring-muted bg-transparent" data-focus="false" data-hover="false">
+                                    <input type="password" {...register("password")} placeholder="Enter your password" className="rizzui-input-field w-full border-0 bg-transparent p-0 focus:outline-none focus:ring-0 [&amp;::-ms-clear]:hidden [&amp;::-ms-reveal]:hidden [&amp;::-webkit-search-cancel-button]:hidden [&amp;::-webkit-inner-spin-button]:m-0 [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:m-0 [&amp;::-webkit-outer-spin-button]:appearance-none" name="password" />
+                                </span>
+                            </label>
+                        </div>
                         {errors.password && <Text className="text-red-500 text-sm mt-1">{errors.password.message}</Text>}
                     </div>
 

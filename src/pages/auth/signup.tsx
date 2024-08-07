@@ -13,9 +13,12 @@ import { useEffect } from "react";
 const signUpSchema = z.object({
     email: z.string().email('Invalid email address').min(1, 'Email is required'),
     userName: z.string().min(3, 'User Name is required'),
-    mobileNo: z.string().min(10, 'Mobile no. is required'),
+    mobileNo: z.string().min(10, 'Mobile no. must have 10 numbers').max(15, 'Mobile no. is required'),
     password: z.string().min(6, 'Password must be at least 6 characters').min(1, 'Password is required'),
-    confirmPassword: z.string().min(6, 'Password must be at least 6 characters').min(1, 'Password is required')
+    confirmPassword: z.string().min(1, 'Password is required'),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Confrim Passwords don't match",
+    path: ["confirmPassword"],
 });
 
 type SignUpSchemaFormInput = z.infer<typeof signUpSchema>;
@@ -91,7 +94,9 @@ export default function Login() {
                         <Input
                             label="Mobile No."
                             placeholder="Enter your mobile no."
+                            type="number"
                             {...register("mobileNo")}
+                            pattern="\d*"
                         />
                         {errors.mobileNo && <Text className="text-red-500 text-sm mt-1">{errors.mobileNo.message}</Text>}
                     </div>
@@ -103,25 +108,29 @@ export default function Login() {
                         />
                         {errors.email && <Text className="text-red-500 text-sm mt-1">{errors.email.message}</Text>}
                     </div>
-
                     <div>
-                        <Input
-                            label="Password"
-                            type="password"
-                            placeholder="Enter your password"
-                            {...register("password")}
-                        />
+                        <div className="rizzui-input-root flex flex-col">
+                            <label className="block">
+                                <span className="rizzui-input-label block text-sm mb-1.5 font-medium">Password</span>
+                                <span className="rizzui-input-container flex items-center peer w-full transition duration-200 [&amp;.is-focus]:ring-[0.8px] ring-[0.6px] [&amp;.is-hover]:border-primary [&amp;.is-focus]:border-primary [&amp;.is-focus]:ring-primary [&amp;_input::placeholder]:opacity-60 px-3.5 py-2 text-sm h-10 rounded-md border border-muted ring-muted bg-transparent" data-focus="false" data-hover="false">
+                                    <input type="password" {...register("password")} placeholder="Enter your password" className="rizzui-input-field w-full border-0 bg-transparent p-0 focus:outline-none focus:ring-0 [&amp;::-ms-clear]:hidden [&amp;::-ms-reveal]:hidden [&amp;::-webkit-search-cancel-button]:hidden [&amp;::-webkit-inner-spin-button]:m-0 [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:m-0 [&amp;::-webkit-outer-spin-button]:appearance-none" name="password" />
+                                </span>
+                            </label>
+                        </div>
                         {errors.password && <Text className="text-red-500 text-sm mt-1">{errors.password.message}</Text>}
                     </div>
                     <div>
-                        <Input
-                            label="Confirm Password"
-                            type="password"
-                            placeholder="Confirm your password"
-                            {...register("confirmPassword")}
-                        />
+                        <div className="rizzui-input-root flex flex-col">
+                            <label className="block">
+                                <span className="rizzui-input-label block text-sm mb-1.5 font-medium">Confirm Password</span>
+                                <span className="rizzui-input-container flex items-center peer w-full transition duration-200 [&amp;.is-focus]:ring-[0.8px] ring-[0.6px] [&amp;.is-hover]:border-primary [&amp;.is-focus]:border-primary [&amp;.is-focus]:ring-primary [&amp;_input::placeholder]:opacity-60 px-3.5 py-2 text-sm h-10 rounded-md border border-muted ring-muted bg-transparent" data-focus="false" data-hover="false">
+                                    <input type="password" {...register("confirmPassword")} placeholder="Enter your password" className="rizzui-input-field w-full border-0 bg-transparent p-0 focus:outline-none focus:ring-0 [&amp;::-ms-clear]:hidden [&amp;::-ms-reveal]:hidden [&amp;::-webkit-search-cancel-button]:hidden [&amp;::-webkit-inner-spin-button]:m-0 [&amp;::-webkit-inner-spin-button]:appearance-none [&amp;::-webkit-outer-spin-button]:m-0 [&amp;::-webkit-outer-spin-button]:appearance-none" name="confirmPassword" />
+                                </span>
+                            </label>
+                        </div>
                         {errors.confirmPassword && <Text className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</Text>}
                     </div>
+
 
                     <div>
                         <Button type="submit" className="w-full bg-indigo-600 text-white hover:bg-indigo-500">
@@ -132,7 +141,7 @@ export default function Login() {
 
                 <Text className="mt-10 text-center text-sm text-gray-500">
                     Already a member?{' '}
-                    <Link href="signup" className="font-semibold text-indigo-600 hover:text-indigo-500">
+                    <Link href="login" className="font-semibold text-indigo-600 hover:text-indigo-500">
                         Login account
                     </Link>
                 </Text>

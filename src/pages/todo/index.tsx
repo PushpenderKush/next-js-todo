@@ -11,7 +11,7 @@ interface Todo {
     id: number;
     title: string;
     description: string;
-    isComplete: boolean;
+    isCompleted: boolean;
 }
 
 const Page: React.FC = () => {
@@ -19,8 +19,10 @@ const Page: React.FC = () => {
     const [todoList, setTodoList] = useState<Todo[]>([]);
     const [deleteTodo] = useDeleteTodoMutation();
     const [updateTodoStatus] = useUpdateTodoStatusMutation();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
     const [todoToDelete, setTodoToDelete] = useState<number | null>(null);
+    const [todoToComplete, setTodoToComplete] = useState<Todo | null>(null);
 
     useEffect(() => {
         if (!isLoading && data?.data && data.data.length > 0) {
@@ -37,30 +39,42 @@ const Page: React.FC = () => {
             } catch (error) {
                 toast.error("Failed to delete todo.");
             } finally {
-                setIsModalOpen(false);
+                setIsDeleteModalOpen(false);
                 setTodoToDelete(null);
             }
         }
     };
 
-    const handleSetComplete = async (id: number, selectedItem: Todo) => {
-        try {
-            await updateTodoStatus({ id, selectedTodo: { ...selectedItem, isComplete: !selectedItem.isComplete } }).unwrap();
-            setTodoList(todoList.map(todo =>
-                todo.id === id ? { ...todo, isComplete: !todo.isComplete } : todo
-            ));
-        } catch (error) {
-            console.error("Failed to update todo status:", error);
+    const handleSetComplete = async () => {
+        if (todoToComplete !== null) {
+            try {
+                await updateTodoStatus({ id: todoToComplete.id, selectedTodo: { ...todoToComplete, isCompleted: !todoToComplete.isCompleted } }).unwrap();
+                setTodoList(todoList.map(todo =>
+                    todo.id === todoToComplete.id ? { ...todo, isCompleted: !todo.isCompleted } : todo
+                ));
+                toast.success(`Todo marked as ${todoToComplete.isCompleted ? "pending" : "complete"}.`);
+            } catch (error) {
+                toast.error("Failed to update todo status.");
+            } finally {
+                setIsCompleteModalOpen(false);
+                setTodoToComplete(null);
+            }
         }
     };
 
-    const openConfirmationModal = useCallback((id: number) => {
+    const openDeleteConfirmationModal = useCallback((id: number) => {
         setTodoToDelete(id);
-        setIsModalOpen(true);
+        setIsDeleteModalOpen(true);
+    }, []);
+
+    const openCompleteConfirmationModal = useCallback((todo: Todo) => {
+        setTodoToComplete(todo);
+        setIsCompleteModalOpen(true);
     }, []);
 
     React.useEffect(() => {
         refetch()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (
@@ -92,19 +106,17 @@ const Page: React.FC = () => {
                                     <Table.Cell>{item.title}</Table.Cell>
                                     <Table.Cell>{item.description}</Table.Cell>
                                     <Table.Cell>
-                                        <Badge className='bg-blue-700 text-white'>{item.isComplete ? "Completed" : 'Pending'}</Badge>
+                                        <Badge className='bg-blue-700 text-white'>{item.isCompleted ? "Completed" : 'Pending'}</Badge>
                                     </Table.Cell>
                                     <Table.Cell >
                                         <div className='flex gap-4'>
-                                            <Button className='bg-red-600 text-black' onClick={() => openConfirmationModal(item.id)}>Delete</Button>
+                                            <Button className='bg-red-600 text-black' onClick={() => openDeleteConfirmationModal(item.id)}>Delete</Button>
                                             <Link href={`/todo/${item.id}`}>
                                                 <Button className='bg-blue-700 text-white'>Edit</Button>
                                             </Link>
-                                            {!item.isComplete && (
-                                                <Button className='text-white' onClick={() => handleSetComplete(item.id, item)}>
-                                                    {item.isComplete ? 'Mark as Pending' : 'Mark as Complete'}
-                                                </Button>
-                                            )}
+                                            <Button className='text-white' onClick={() => openCompleteConfirmationModal(item)}>
+                                                {item.isCompleted ? 'Mark as Pending' : 'Mark as Complete'}
+                                            </Button>
                                         </div>
                                     </Table.Cell>
                                 </Table.Row>
@@ -115,10 +127,17 @@ const Page: React.FC = () => {
             )}
 
             <ConfirmationModal
-                isOpen={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                isOpen={isDeleteModalOpen}
+                onClose={() => setIsDeleteModalOpen(false)}
                 onConfirm={handleDelete}
                 message="Are you sure you want to delete this todo?"
+            />
+
+            <ConfirmationModal
+                isOpen={isCompleteModalOpen}
+                onClose={() => setIsCompleteModalOpen(false)}
+                onConfirm={handleSetComplete}
+                message={`Are you sure you want to mark this todo as ${todoToComplete?.isCompleted ? "pending" : "complete"}?`}
             />
         </div>
     );
